@@ -1,0 +1,27 @@
+{
+  "name": "gdgt-discord-bot",
+  "version": "0.0.1",
+  "description": "",
+  "homepage": "https://github.com/gabriel-caraman/gdgt-discord-bot#readme",
+  "bugs": {
+    "url": "https://github.com/gabriel-caraman/gdgt-discord-bot/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gabriel-caraman/gdgt-discord-bot.git"
+  },
+  "author": "Gabriel Caraman",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "discord.js": "^14.27.0",
+    "dotenv": "^17.4.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.8.0"
+  }
+}
