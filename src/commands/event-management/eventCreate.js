@@ -1,10 +1,10 @@
-import { SlashCommandBuilder } from "discord.js";
+import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
 import { EventModel } from "../../models/eventModel.js";
 
 export const data = new SlashCommandBuilder()
     .setName('event-create')
     .setDescription('Create a new event.')
-    // add check for admin privileges
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addStringOption(option =>
         option.setName('name')
             .setDescription('Name of the tournament.')
@@ -21,20 +21,31 @@ export const data = new SlashCommandBuilder()
     );
 
 export async function execute(interaction) {
+    await interaction.deferReply();
+
+    const eventTag = interaction.options.getString('tag').toUpperCase();
+    const tagRegex = /^[A-Z0-9]+$/;
+    if (!tagRegex.test(eventTag)) {
+        await interaction.followUp('The event tag can only contain alphanumeric values.');
+        return;
+    }
+    if (await EventModel.exists({ _id: eventTag })) {
+        await interaction.followUp(`An event already has the ${eventTag} tag.`);
+        return;
+    }
+
     const eventName = interaction.options.getString('name');
-    // add check for ascii characters only
-
-    const eventTag = interaction.options.getString('tag');
-    // add check for alphanumerical values only
-
     const eventDefaultStage = interaction.options.getString('default-stage') ?? 'Qualifiers';
 
     const event = new EventModel({
+        _id: eventTag,
         name: eventName,
-        tag: eventTag,
-        defaultStage: eventDefaultStage,
+        stages: [{
+            stageName: eventDefaultStage,
+            stageOrder: 1,
+        }],
     });
 
     await event.save();
-    await interaction.reply(`Successfully created the event ${eventName}.`);
+    await interaction.followUp(`Successfully created the event ${eventName}.`);
 }

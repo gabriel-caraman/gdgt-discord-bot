@@ -24,7 +24,7 @@ client.commands = new Collection();
             client.commands.set(commandsArray[i].data.name, commandsArray[i]);
         }
         
-        mongoose.connect(mongoConnectionURL);
+        await mongoose.connect(mongoConnectionURL);
 
     } catch (error) { console.log(error); }
 })();
