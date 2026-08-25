@@ -1,17 +1,16 @@
 import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
-import "dotenv/config";
 
 import { WhitelistCheck } from "../../utility/whitelistCheck.js";
-import { EventModel } from "../../models/eventModel.js";
 import { GuildConfigModel } from "../../models/guildConfigModel.js";
+import { EventModel } from "../../models/eventModel.js";
 
 export const data = new SlashCommandBuilder()
-    .setName('event-delete')
-    .setDescription('Deletes an event by tag. Admin & whitelist locked.')
+    .setName('event-set-active')
+    .setDescription('Sets the event as active/default for this server. All commands will automatically use this event.')
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addStringOption(option =>
         option.setName('tag')
-            .setDescription('The unique tag of the event.')
+            .setDescription('The unique tag/id of the event.')
             .setRequired(true)
     );
 
@@ -23,17 +22,19 @@ export async function execute(interaction) {
         return;
     }
 
-    const deletedEventId = interaction.options.getString('tag').toUpperCase();
-    const deleteResult = await EventModel.deleteOne({ _id: deletedEventId });
-    if (deleteResult.deletedCount == 0) {
-        await interaction.followUp(`No event found with the tag ${deletedEventId}.`);
+    const eventTag = interaction.options.getString('tag').toUpperCase();
+    if (!await EventModel.exists({ _id: eventTag})) {
+        await interaction.followUp(`No event has been found with the ${eventTag} tag.`);
         return;
     }
 
+    //to do: check if event is archived
+
     await GuildConfigModel.findOneAndUpdate(
-        { activeEvent: deletedEventId },
-        { activeEvent: null },
+        { _id: interaction.guild.id },
+        { activeEvent: eventTag },
+        { upsert: true },
     );
 
-    await interaction.followUp(`Successfully deleted the event with the tag ${deletedEventId}.`);
+    await interaction.followUp(`Set the ${eventTag} event as the default/active event.`);
 }

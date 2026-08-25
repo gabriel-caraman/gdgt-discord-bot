@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import "dotenv/config";
 
-import { loadCommands } from "./utility/loadCommands.js";
+import { LoadCommands } from "./utility/loadCommands.js";
 import { commandHandler } from "./handlers/commandHandler.js";
 
 const mongoConnectionURL = 'mongodb://localhost/gdgt';
@@ -19,7 +19,7 @@ client.commands = new Collection();
 
 (async () => {
     try {
-        const commandsArray = await loadCommands();
+        const commandsArray = await LoadCommands();
         for (let i = 0; i < commandsArray.length; i++) {
             client.commands.set(commandsArray[i].data.name, commandsArray[i]);
         }

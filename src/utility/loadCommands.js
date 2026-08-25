@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-export async function loadCommands() {
+export async function LoadCommands() {
     const commands = [];
 
     const foldersPath = fileURLToPath(new URL('../commands', import.meta.url));

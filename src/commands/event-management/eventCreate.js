@@ -1,4 +1,6 @@
 import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
+
+import { WhitelistCheck } from "../../utility/whitelistCheck.js";
 import { EventModel } from "../../models/eventModel.js";
 
 export const data = new SlashCommandBuilder()
@@ -22,6 +24,11 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction) {
     await interaction.deferReply();
+
+    if (!WhitelistCheck(interaction.user.id)) {
+        await interaction.followUp('You are not whitelisted for this action.');
+        return;
+    }
 
     const eventTag = interaction.options.getString('tag').toUpperCase();
     const tagRegex = /^[A-Z0-9]+$/;

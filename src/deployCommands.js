@@ -1,14 +1,14 @@
 import { REST, Routes } from "discord.js";
 import "dotenv/config";
 
-import { loadCommands } from "./utility/loadCommands.js";
+import { LoadCommands } from "./utility/loadCommands.js";
 
 const commands = [];
 const rest = new REST().setToken(process.env.DISCORD_BOT_TOKEN);
 
 (async () => {
     try {
-        const commandsArray = await loadCommands();
+        const commandsArray = await LoadCommands();
         for (let i = 0; i < commandsArray.length; i++) {
             commands.push(commandsArray[i].data.toJSON());
         }
