@@ -9,17 +9,17 @@ export const data = new SlashCommandBuilder()
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addStringOption(option =>
         option.setName('name')
-            .setDescription('Name of the tournament.')
+            .setDescription('Name of the event.')
             .setRequired(true)
     )
     .addStringOption(option =>
         option.setName('tag')
-            .setDescription('Unique tag of the tournament (alphanumerical values only).')
+            .setDescription('Unique tag of the event (alphanumerical values only).')
             .setRequired(true)
     )
     .addStringOption(option =>
         option.setName('default-stage')
-            .setDescription('Default/first stage of the tournament (default: Qualifiers).')
+            .setDescription('Default/first stage of the event (default: Qualifiers).')
     );
 
 export async function execute(interaction) {

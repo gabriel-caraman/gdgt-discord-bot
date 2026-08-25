@@ -7,7 +7,10 @@ const eventSchema = new Schema({
     },
     name: String,
     stages: [{
-        stageName: String,
+        stageName: {
+            type: String,
+            unique: true,
+        },
         stageOrder: Number,
     }],
     teamSizeMin: Number,
