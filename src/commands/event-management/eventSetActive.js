@@ -6,7 +6,7 @@ import { EventModel } from "../../models/eventModel.js";
 
 export const data = new SlashCommandBuilder()
     .setName('event-set-active')
-    .setDescription('Sets the event as active/default for this server. All commands will automatically use this event.')
+    .setDescription('Set the event as active/default for this server. All commands will automatically use this event.')
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addStringOption(option =>
         option.setName('tag')
@@ -28,13 +28,15 @@ export async function execute(interaction) {
         return;
     }
 
+    //to do: check if the current event is already active, then return
+
     //to do: check if event is archived
 
-    await GuildConfigModel.findOneAndUpdate(
-        { _id: interaction.guild.id },
+    await GuildConfigModel.findByIdAndUpdate(
+        interaction.guild.id,
         { activeEvent: eventTag },
         { upsert: true },
     );
 
-    await interaction.followUp(`Set the ${eventTag} event as the default/active event.`);
+    await interaction.followUp(`Set the ${eventTag} event as the default/active event for the guild ${interaction.guild.name}.`);
 }

@@ -51,6 +51,8 @@ export async function execute(interaction) {
             stageName: eventDefaultStage,
             stageOrder: 1,
         }],
+        teamSizeMin: 2,
+        teamSizeMax: 5,
     });
 
     await event.save();

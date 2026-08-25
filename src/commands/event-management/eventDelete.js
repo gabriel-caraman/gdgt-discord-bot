@@ -7,7 +7,7 @@ import { GuildConfigModel } from "../../models/guildConfigModel.js";
 
 export const data = new SlashCommandBuilder()
     .setName('event-delete')
-    .setDescription('Deletes an event by tag. Admin & whitelist locked.')
+    .setDescription('Delete an event by tag. Admin & whitelist locked.')
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addStringOption(option =>
         option.setName('tag')

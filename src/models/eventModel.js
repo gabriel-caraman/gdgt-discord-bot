@@ -10,6 +10,8 @@ const eventSchema = new Schema({
         stageName: String,
         stageOrder: Number,
     }],
+    teamSizeMin: Number,
+    teamSizeMax: Number,
 });
 
 export const EventModel = model('Event', eventSchema);
