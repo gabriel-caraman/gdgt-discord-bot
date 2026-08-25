@@ -53,6 +53,8 @@ export async function execute(interaction) {
         }],
         teamSizeMin: 2,
         teamSizeMax: 5,
+        registrationsState: false,
+        submissionsState: false,
     });
 
     await event.save();

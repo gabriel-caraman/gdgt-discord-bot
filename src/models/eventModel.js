@@ -12,6 +12,8 @@ const eventSchema = new Schema({
     }],
     teamSizeMin: Number,
     teamSizeMax: Number,
+    registrationsState: Boolean,
+    submissionsState: Boolean,
 });
 
 export const EventModel = model('Event', eventSchema);

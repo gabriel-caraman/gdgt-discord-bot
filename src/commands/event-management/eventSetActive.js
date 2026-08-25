@@ -27,16 +27,13 @@ export async function execute(interaction) {
         await interaction.followUp(`No event has been found with the ${eventTag} tag.`);
         return;
     }
-
-    //to do: check if the current event is already active, then return
-
     //to do: check if event is archived
 
-    await GuildConfigModel.findByIdAndUpdate(
+    const currentConfig = await GuildConfigModel.findByIdAndUpdate(
         interaction.guild.id,
         { activeEvent: eventTag },
         { upsert: true },
     );
-
+    
     await interaction.followUp(`Set the ${eventTag} event as the default/active event for the guild ${interaction.guild.name}.`);
 }

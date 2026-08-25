@@ -33,8 +33,6 @@ export async function execute(interaction) {
         return;
     }
 
-    // to do: check how it behaves with string values
-
     const tsMin = interaction.options.getInteger('min');
     const tsMax = interaction.options.getInteger('max');
     if (tsMin > tsMax) {
