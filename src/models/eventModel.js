@@ -13,10 +13,26 @@ const eventSchema = new Schema({
         },
         stageOrder: Number,
     }],
-    teamSizeMin: Number,
-    teamSizeMax: Number,
-    registrationsState: Boolean,
-    submissionsState: Boolean,
+    teamSizeMin: {
+        type: Number,
+        default: 2,
+    },
+    teamSizeMax: {
+        type: Number,
+        default: 5,
+    },
+    registrationsState: {
+        type: Boolean,
+        default: false,
+    },
+    submissionsState: {
+            type: Boolean,
+        default: false,
+    },
+    archiveState: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 export const EventModel = model('Event', eventSchema);

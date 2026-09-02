@@ -50,11 +50,7 @@ export async function execute(interaction) {
         stages: [{
             stageName: eventDefaultStage,
             stageOrder: 1,
-        }],
-        teamSizeMin: 2,
-        teamSizeMax: 5,
-        registrationsState: false,
-        submissionsState: false,
+        }]
     });
 
     await event.save();

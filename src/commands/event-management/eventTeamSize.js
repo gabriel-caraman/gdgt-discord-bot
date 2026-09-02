@@ -1,7 +1,7 @@
 import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
 
 import { WhitelistCheck } from "../../utility/whitelistCheck.js";
-import { ActiveEventCheck } from "../../utility/activeEventCheck.js";
+import { LoadActiveEvent } from "../../utility/loadActiveEvent.js";
 import { EventModel } from "../../models/eventModel.js";
 
 export const data = new SlashCommandBuilder()
@@ -29,9 +29,14 @@ export async function execute(interaction) {
         return;
     }
 
-    const activeEventTag = await ActiveEventCheck(interaction.guild.id);
-    if (!activeEventTag) {
-        await interaction.followUp('No active event set for this server.');
+    const event = await LoadActiveEvent(interaction.guild.id);
+    if (!event) {
+        await interaction.followUp(`No active event set for the guild ${interaction.guild.name}.`);
+        return;
+    }
+
+    if (event.archiveState) {
+        await interaction.followUp(`The event ${event.name} is archived.`);
         return;
     }
 
@@ -42,14 +47,9 @@ export async function execute(interaction) {
         return;
     }
 
-    const activeEvent = await EventModel.findByIdAndUpdate(
-        activeEventTag,
-        { 
-            teamSizeMin: tsMin,
-            teamSizeMax: tsMax,
-        },
-        { returnDocument: 'after' },
-    );
+    event.teamSizeMin = tsMin;
+    event.teamSizeMax = tsMax;
 
-    await interaction.followUp(`Updated team size for ${activeEvent.name}: ${tsMin}-${tsMax}`);
+    await event.save();
+    await interaction.followUp(`Updated team size for ${event.name}: ${tsMin}-${tsMax}`);
 }

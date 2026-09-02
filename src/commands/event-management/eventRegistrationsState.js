@@ -1,7 +1,7 @@
 import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
 
 import { WhitelistCheck } from "../../utility/whitelistCheck.js";
-import { ActiveEventCheck } from "../../utility/activeEventCheck.js";
+import { LoadActiveEvent } from "../../utility/loadActiveEvent.js";
 import { EventModel } from "../../models/eventModel.js";
 
 export const data = new SlashCommandBuilder()
@@ -22,20 +22,21 @@ export async function execute(interaction) {
         return;
     }
 
-    const activeEventTag = await ActiveEventCheck(interaction.guild.id);
-    if (!activeEventTag) {
-        await interaction.followUp('No active event set for this server.');
+    const event = await LoadActiveEvent(interaction.guild.id);
+    if (!event) {
+        await interaction.followUp(`No active event set for the guild ${interaction.guild.name}.`);
+        return;
+    }
+
+    if (event.archiveState) {
+        await interaction.followUp(`The event ${event.name} is archived.`);
         return;
     }
 
     const regState = interaction.options.getBoolean('state');
-    
-    const activeEvent = await EventModel.findByIdAndUpdate(
-        activeEventTag,
-        { registrationsState: regState },
-        { returnDocument: 'after' },
-    );
+    event.registrationsState = regState;
 
-    const stringState = regState ? 'open' : 'closed';
-    await interaction.followUp(`Registrations are now ${stringState} for the event ${activeEvent.name}.`);
+    await event.save();
+    const stateString = regState ? 'open' : 'closed';
+    await interaction.followUp(`Registrations are now ${stateString} for the event ${event.name}.`);
 }

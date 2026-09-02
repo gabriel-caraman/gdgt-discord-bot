@@ -23,17 +23,21 @@ export async function execute(interaction) {
     }
 
     const eventTag = interaction.options.getString('tag').toUpperCase();
-    if (!await EventModel.exists({ _id: eventTag})) {
+    const event = await EventModel.findById(eventTag);
+    if (!event) {
         await interaction.followUp(`No event has been found with the ${eventTag} tag.`);
         return;
     }
-    //to do: check if event is archived
+    
+    if (event.archiveState) {
+        await interaction.followUp(`The event ${event.name} is archived.`);
+        return;
+    }
 
-    const currentConfig = await GuildConfigModel.findByIdAndUpdate(
+    await GuildConfigModel.findByIdAndUpdate(
         interaction.guild.id,
         { activeEvent: eventTag },
         { upsert: true },
     );
-    
     await interaction.followUp(`Set the ${eventTag} event as the default/active event for the guild ${interaction.guild.name}.`);
 }
