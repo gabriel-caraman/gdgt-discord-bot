@@ -9,7 +9,6 @@ const eventSchema = new Schema({
     stages: [{
         stageName: {
             type: String,
-            unique: true,
         },
         stageOrder: Number,
     }],

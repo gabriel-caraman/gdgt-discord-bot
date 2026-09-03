@@ -1,0 +1,81 @@
+import { SlashCommandBuilder, EmbedBuilder, MessageFlags } from "discord.js"
+
+import { EventModel } from "../../models/eventModel.js";
+import { LoadActiveEvent } from "../../utility/loadActiveEvent.js";
+import { FollowUpEmbed, EmbedColors } from "../../utility/followUpEmbed.js";
+
+export const data = new SlashCommandBuilder()
+    .setName('event-info')
+    .setDescription('Get all important info about an event.')
+    .addStringOption(option =>
+        option.setName('tag')
+            .setDescription('The unique tag of the event.')
+            .setRequired(false)
+    );
+
+export async function execute(interaction) {
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
+    let event;
+    let eventId = interaction.options.getString('tag');
+    if (eventId) {
+        eventId = eventId.toUpperCase();
+        event = await EventModel.findById(eventId);
+    } else {
+        event = await LoadActiveEvent(interaction.guild.id);
+    }
+
+    if (!event) {
+        let errorMessage = `No event found with the id ${eventId}.`;
+        if (!eventId) {
+            errorMessage = `No active event set for the guild **${interaction.guild.name}**.`;
+        }
+
+        await interaction.followUp({
+            embeds: [FollowUpEmbed(
+                'Error',
+                errorMessage,
+                EmbedColors.ERROR,
+            )],
+        });
+        return;
+    }
+
+    const embed = new EmbedBuilder()
+        .setTitle(event.name)
+        .setDescription(String(event._id))
+        .setColor(EmbedColors.INFO);
+    
+    if (event.archiveState) {
+        embed.addFields(
+            {
+                name: 'Archived:',
+                value: String(event.archiveState),
+            },
+        );
+        embed.setColor(EmbedColors.INACTIVE);
+    }
+
+    // First row: general settings
+    embed.addFields(
+        {
+            name: 'Team size:',
+            value: `${event.teamSizeMin}-${event.teamSizeMax}`,
+            inline: true,
+        },
+        {
+            name: 'Registrations open:',
+            value: String(event.registrationsState),
+            inline: true,
+        },
+        {
+            name: 'Submissions open:',
+            value: String(event.submissionsState),
+            inline: true,
+        },
+    );
+
+    // next up are stages; teams; etc.
+
+    await interaction.followUp({ embeds: [embed] });
+}

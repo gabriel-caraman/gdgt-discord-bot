@@ -4,6 +4,7 @@ import "dotenv/config";
 import { WhitelistCheck } from "../../utility/whitelistCheck.js";
 import { EventModel } from "../../models/eventModel.js";
 import { GuildConfigModel } from "../../models/guildConfigModel.js";
+import { FollowUpEmbed, EmbedColors } from "../../utility/followUpEmbed.js";
 
 export const data = new SlashCommandBuilder()
     .setName('event-delete')
@@ -19,19 +20,36 @@ export async function execute(interaction) {
     await interaction.deferReply();
 
     if (!WhitelistCheck(interaction.user.id)) {
-        await interaction.followUp('You are not whitelisted for this action.');
+        await interaction.followUp({
+            embeds: [FollowUpEmbed(
+                'Error',
+                'You are not whitelisted for this action.',
+                EmbedColors.ERROR,
+            )],
+        });
         return;
     }
 
     const eventId = interaction.options.getString('tag').toUpperCase();
     const event = await EventModel.findById(eventId);
     if (!event) {
-        await interaction.followUp(`No event found with the tag ${eventId}.`);
+        await interaction.followUp({
+            embeds: [FollowUpEmbed(
+                'Error',
+                `No event found with the tag ${eventId}.`,
+                EmbedColors.ERROR,
+            )],
+        });
         return;
     }
-
     if (event.archiveState) {
-        await interaction.followUp(`The event ${event.name} is archived.`);
+        await interaction.followUp({
+            embeds: [FollowUpEmbed(
+                'Error',
+                `The event **${event.name}** is archived.`,
+                EmbedColors.ERROR,
+            )],
+        });
         return;
     }
 
@@ -41,5 +59,11 @@ export async function execute(interaction) {
         { activeEvent: null },
     );
 
-    await interaction.followUp(`Successfully deleted the event with the tag ${eventId}.`);
+    await interaction.followUp({
+        embeds: [FollowUpEmbed(
+            'Success',
+            `Successfully deleted the event **${event.name}** with the tag ${eventId}.`,
+            EmbedColors.SUCCESS,
+        )],
+    });
 }

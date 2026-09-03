@@ -3,6 +3,7 @@ import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
 import { WhitelistCheck } from "../../utility/whitelistCheck.js";
 import { LoadActiveEvent } from "../../utility/loadActiveEvent.js";
 import { EventModel } from "../../models/eventModel.js";
+import { FollowUpEmbed, EmbedColors } from "../../utility/followUpEmbed.js";
 
 export const data = new SlashCommandBuilder()
     .setName('event-stage')
@@ -24,18 +25,35 @@ export async function execute(interaction) {
     await interaction.deferReply();
 
     if (!WhitelistCheck(interaction.user.id)) {
-        await interaction.followUp('You are not whitelisted for this action.');
+        await interaction.followUp({
+            embeds: [FollowUpEmbed(
+                'Error',
+                'You are not whitelisted for this action.',
+                EmbedColors.ERROR,
+            )],
+        });
         return;
     }
     
     const event = await LoadActiveEvent(interaction.guild.id);
     if (!event) {
-        await interaction.followUp(`No active event set for the guild ${interaction.guild.name}.`);
+        await interaction.followUp({
+            embeds: [FollowUpEmbed(
+                'Error',
+                `No active event set for the guild **${interaction.guild.name}**.`,
+                EmbedColors.ERROR,
+            )],
+        });
         return;
     }
-
     if (event.archiveState) {
-        await interaction.followUp(`The event ${event.name} is archived.`);
+        await interaction.followUp({
+            embeds: [FollowUpEmbed(
+                'Error',
+                `The event **${event.name}** is archived.`,
+                EmbedColors.ERROR,
+            )],
+        });
         return;
     }
 
@@ -46,34 +64,56 @@ export async function execute(interaction) {
     if (queryOrder === 0) {
         await event.stages.pull({ stageName: queryName });
         await event.save();
-
-        await interaction.followUp(`Updated the ${queryName} stage from the event ${event.name}.`);
+        await interaction.followUp({
+            embeds: [FollowUpEmbed(
+                'Success',
+                `Deleted the stage **${queryName}** from the event **${event.name}**.`,
+                EmbedColors.SUCCESS,
+            )],
+        });
         return;
     }
 
     // Update the stage (name/order)
     for (let i = 0; i < event.stages.length; i++) {
         if (event.stages[i].stageOrder == queryOrder) {
-            await interaction.followUp(`The ${event.stages[i].stageName} stage already occupies this order number.`);
+            await interaction.followUp({
+                embeds: [FollowUpEmbed(
+                    'Success',
+                    `The stage ${event.stages[i].stageName} already occupies this order number.`,
+                    EmbedColors.SUCCESS,
+                )],
+            });
             return;
         }
     }
-
     for (let i = 0; i < event.stages.length; i++) {
         if (event.stages[i].stageName == queryName) {
             event.stages[i].stageOrder = queryOrder;
             await event.save();
-
-            await interaction.followUp(`Updated the ${event.stages[i].stageName} stage (order: ${event.stages[i].stageOrder}) from the event ${event.name}`);
+            await interaction.followUp({
+                embeds: [FollowUpEmbed(
+                    'Success',
+                    `Updated the stage ${event.stages[i].stageName} (order: ${event.stages[i].stageOrder}) from the event ${event.name}.`,
+                    EmbedColors.SUCCESS,
+                )],
+            });
             return;
         }
     }
 
     // Add a new stage
-    await event.stages.push({
+    event.stages.push({
         stageName: queryName,
         stageOrder: queryOrder,
     });
+    
     await event.save();
-    await interaction.followUp(`Added the ${queryName} stage to the event ${event.name}.`);
+    await interaction.followUp({
+        embeds: [FollowUpEmbed(
+            'Success',
+            `Added the stage **${queryName}** to the event **${event.name}**.`,
+            EmbedColors.SUCCESS,
+        )],
+    });
 }

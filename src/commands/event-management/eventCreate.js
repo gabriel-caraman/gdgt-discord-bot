@@ -2,6 +2,7 @@ import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
 
 import { WhitelistCheck } from "../../utility/whitelistCheck.js";
 import { EventModel } from "../../models/eventModel.js";
+import { FollowUpEmbed, EmbedColors } from "../../utility/followUpEmbed.js";
 
 export const data = new SlashCommandBuilder()
     .setName('event-create')
@@ -26,18 +27,36 @@ export async function execute(interaction) {
     await interaction.deferReply();
 
     if (!WhitelistCheck(interaction.user.id)) {
-        await interaction.followUp('You are not whitelisted for this action.');
+        await interaction.followUp({
+            embeds: [FollowUpEmbed(
+                'Error',
+                'You are not whitelisted for this action.',
+                EmbedColors.ERROR,
+            )],
+        });
         return;
     }
 
-    const eventTag = interaction.options.getString('tag').toUpperCase();
+    const eventId = interaction.options.getString('tag').toUpperCase();
     const tagRegex = /^[A-Z0-9]+$/;
-    if (!tagRegex.test(eventTag)) {
-        await interaction.followUp('The event tag can only contain alphanumeric values.');
+    if (!tagRegex.test(eventId)) {
+        await interaction.followUp({
+            embeds: [FollowUpEmbed(
+                'Error',
+                'The event tag can only contain alphanumeric values.',
+                EmbedColors.ERROR,
+            )],
+        });
         return;
     }
-    if (await EventModel.exists({ _id: eventTag })) {
-        await interaction.followUp(`An event already has the ${eventTag} tag.`);
+    if (await EventModel.exists({ _id: eventId })) {
+        await interaction.followUp({
+            embeds: [FollowUpEmbed(
+                'Error',
+                `An event already has the ${eventId} tag.`,
+                EmbedColors.ERROR,
+            )],
+        });
         return;
     }
 
@@ -45,7 +64,7 @@ export async function execute(interaction) {
     const eventDefaultStage = interaction.options.getString('default-stage') ?? 'Qualifiers';
 
     const event = new EventModel({
-        _id: eventTag,
+        _id: eventId,
         name: eventName,
         stages: [{
             stageName: eventDefaultStage,
@@ -54,5 +73,11 @@ export async function execute(interaction) {
     });
 
     await event.save();
-    await interaction.followUp(`Successfully created the event ${eventName}.`);
+    await interaction.followUp({
+        embeds: [FollowUpEmbed(
+            'Success',
+            `Successfully created the event **${eventName}** with the tag ${eventId}.`,
+            EmbedColors.SUCCESS,
+        )],
+    });
 }
