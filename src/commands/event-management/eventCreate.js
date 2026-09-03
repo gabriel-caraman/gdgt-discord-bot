@@ -3,6 +3,7 @@ import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
 import { WhitelistCheck } from "../../utility/whitelistCheck.js";
 import { EventModel } from "../../models/eventModel.js";
 import { FollowUpEmbed, EmbedColors } from "../../utility/followUpEmbed.js";
+import { CreateParticipantRole } from "../../utility/participantRoleManager.js";
 
 export const data = new SlashCommandBuilder()
     .setName('event-create')
@@ -63,9 +64,12 @@ export async function execute(interaction) {
     const eventName = interaction.options.getString('name');
     const eventDefaultStage = interaction.options.getString('default-stage') ?? 'Qualifiers';
 
+    const eventRole = await CreateParticipantRole(interaction, `${eventId} Participant`);
+
     const event = new EventModel({
         _id: eventId,
         name: eventName,
+        roleId: eventRole.id,
         stages: [{
             stageName: eventDefaultStage,
             stageOrder: 1,
@@ -76,7 +80,7 @@ export async function execute(interaction) {
     await interaction.followUp({
         embeds: [FollowUpEmbed(
             'Success',
-            `Successfully created the event **${eventName}** with the tag ${eventId}.`,
+            `Successfully created the event **${eventName}** with the tag ${eventId}. Participant role: <@&${eventRole.id}>`,
             EmbedColors.SUCCESS,
         )],
     });

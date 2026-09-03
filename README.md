@@ -1,6 +1,10 @@
 # gdgt-discord-bot
 WIP; Using Node.js v24.18.0
 
+Dev portal setup: in the OAuth2 tab under OAuth2 URL Generator enable: `applications.commands` and `bot`. For the bot permissions just tick off `Administrator`.
+
+Discord server setup: move the bot role all the way up, and don't forget to set the Server Member role ID in the .env file if you haven't already.
+
 ## Setup (temporary, will add Docker components and change this)
 1. Run `npm install` to get all needed packages
 2. Create or add the .env file in the source directory

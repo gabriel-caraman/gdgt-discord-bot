@@ -1,10 +1,10 @@
 import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
-import "dotenv/config";
 
 import { WhitelistCheck } from "../../utility/whitelistCheck.js";
 import { EventModel } from "../../models/eventModel.js";
 import { GuildConfigModel } from "../../models/guildConfigModel.js";
 import { FollowUpEmbed, EmbedColors } from "../../utility/followUpEmbed.js";
+import { DeleteParticipantRole } from "../../utility/participantRoleManager.js";
 
 export const data = new SlashCommandBuilder()
     .setName('event-delete')
@@ -54,6 +54,7 @@ export async function execute(interaction) {
     }
 
     await event.deleteOne();
+    await DeleteParticipantRole(interaction, event.roleId);
     await GuildConfigModel.findOneAndUpdate(
         { activeEvent: eventId },
         { activeEvent: null },

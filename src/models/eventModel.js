@@ -6,10 +6,9 @@ const eventSchema = new Schema({
         required: true,
     },
     name: String,
+    roleId: String,
     stages: [{
-        stageName: {
-            type: String,
-        },
+        stageName: String,
         stageOrder: Number,
     }],
     teamSizeMin: {
