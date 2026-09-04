@@ -14,9 +14,10 @@ Discord server setup: move the bot role all the way up, and don't forget to set 
 ## Commands
 WIP; fields with the question mark (?) at the end are not required
 
-### Event management
 //TO DO: add a confirmation dialog
-* `/event-create [name] [tag] [default-stage?]` - Create an event with a unique alphanumerical tag. The first stage is set by default to Qualifiers. // TO DO: make a default participation role for the event
+
+### Event management
+* `/event-create [name] [tag] [default-stage?]` - Create an event with a unique alphanumerical tag. The first stage is set by default to Qualifiers.
 
 * `/event-delete [tag]` - Delete the event with the given tag.
 
@@ -39,3 +40,4 @@ WIP; fields with the question mark (?) at the end are not required
 
 
 ### Team management
+* `/team-create [name] [tag]` - Create a new team for the active event with yourself as the captain. WIP

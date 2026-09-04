@@ -82,7 +82,8 @@ export async function execute(interaction) {
         },
     );
 
-    // Stages TO DO: add number of entries to all stages
+    // Stages 
+    // TO DO: add number of entries to all stages
     const stages = event.stages;
     stages.sort((a, b) => a.stageOrder - b.stageOrder);
 
