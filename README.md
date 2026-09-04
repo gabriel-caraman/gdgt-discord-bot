@@ -36,3 +36,6 @@ WIP; fields with the question mark (?) at the end are not required
     - All other cases will update the stage with the provided name
 
 * `/event-archive [tag] [state]` - Archive/unarchive an event. Archived events will be locked from any changes both by admins and participants.
+
+
+### Team management

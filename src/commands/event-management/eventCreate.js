@@ -80,7 +80,7 @@ export async function execute(interaction) {
     await interaction.followUp({
         embeds: [FollowUpEmbed(
             'Success',
-            `Successfully created the event **${eventName}** with the tag ${eventId}. Participant role: <@&${eventRole.id}>`,
+            `Successfully created the event **${eventName}** with the tag ${eventId}.\nParticipant role: <@&${eventRole.id}>`,
             EmbedColors.SUCCESS,
         )],
     });

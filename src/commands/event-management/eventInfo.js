@@ -11,6 +11,11 @@ export const data = new SlashCommandBuilder()
         option.setName('tag')
             .setDescription('The unique tag of the event.')
             .setRequired(false)
+    )
+    .addBooleanOption(option =>
+        option.setName('show-stage-order')
+            .setDescription('Optional flag, mostly for debugging purposes.')
+            .setRequired(false)
     );
 
 export async function execute(interaction) {
@@ -46,36 +51,57 @@ export async function execute(interaction) {
         .setDescription(String(event._id))
         .setColor(EmbedColors.INFO);
     
+    // Participant role
+    embed.addFields(
+        { name: 'Role', value: `<@&${event.roleId}>` }
+    );
+
+    // Archive state
     if (event.archiveState) {
         embed.addFields(
-            {
-                name: 'Archived:',
-                value: String(event.archiveState),
-            },
-        );
-        embed.setColor(EmbedColors.INACTIVE);
+            { name: 'Archived', value: String(event.archiveState) }
+        ).setColor(EmbedColors.INACTIVE);
     }
 
-    // First row: general settings
+    // General settings
     embed.addFields(
         {
-            name: 'Team size:',
+            name: 'Team size',
             value: `${event.teamSizeMin}-${event.teamSizeMax}`,
             inline: true,
         },
         {
-            name: 'Registrations open:',
+            name: 'Registrations open',
             value: String(event.registrationsState),
             inline: true,
         },
         {
-            name: 'Submissions open:',
+            name: 'Submissions open',
             value: String(event.submissionsState),
             inline: true,
         },
     );
 
-    // next up are stages; teams; etc.
+    // Stages TO DO: add number of entries to all stages
+    const stages = event.stages;
+    stages.sort((a, b) => a.stageOrder - b.stageOrder);
+
+    let stagesString = '';
+    const showStageOrder = interaction.options.getBoolean('show-stage-order');
+
+    if (!showStageOrder) {
+        stages.forEach(stage => {
+            stagesString += `- ${stage.stageName}\n`;
+        });
+    } else {
+        stages.forEach(stage => {
+            stagesString += `- ${stage.stageName} (order: ${stage.stageOrder})\n`;
+        });
+    }
+
+    embed.addFields(
+        { name: 'Stages', value: stagesString }
+    );
 
     await interaction.followUp({ embeds: [embed] });
 }
